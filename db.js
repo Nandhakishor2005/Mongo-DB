@@ -19,13 +19,19 @@ async function conn(){
         // const result = await students.insertOne({name : "nandhakishor", age : 21});
         // console.log(result.insertedId);
 
-        const result = await students.insertMany([
-            {name : "Nandhakishor", age : 21, grade : "A", entrolled : true},
-            {name : "Jithu Biju", age : 21, grade : "A+", entrolled : true},
-            {name : "Prabin Pradeep", age : 21, grade : "A+", entrolled : true}
-        ]);
-        console.log(result.insertedCount);
-        console.log(result.insertedIds);
+        // const result = await students.insertMany([
+        //     {name : "Nandhakishor", age : 21, grade : "A", entrolled : true},
+        //     {name : "Jithu Biju", age : 21, grade : "A+", entrolled : true},
+        //     {name : "Prabin Pradeep", age : 21, grade : "A+", entrolled : true}
+        // ]);
+        // console.log(result.insertedCount);
+        // console.log(result.insertedIds);
+
+         let change=  await students.updateOne({ name : "Jithu Biju" }, // Which document to update 
+            { $set: { age: 22 } }) // What to update
+
+            console.log(change);
+
 
 
 
