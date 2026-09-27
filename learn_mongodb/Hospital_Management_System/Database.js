@@ -4,28 +4,10 @@ const url = "mongodb://localhost:27017";
 const client = new MongoClient(url);
 const readline = require("readline");
 
-
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-
-function askQuestion(query){
-    return new Promise((resolve) => {
-        rl.question(query, (answer) => {
-            resolve(answer);
-        });
-    });
-}
-
-async function main(){
-    const name = await askQuestion(" Are you a new User?");
-    //const age = await askQuestion("What is your?");
-    rl.close();
-}
-
-main();
-
 
 async function connect() {
     try{
@@ -103,6 +85,34 @@ async function connect() {
     //         departmentsId: 5
     //     }
     // ])
+
+    function askQuestion(query){
+    return new Promise((resolve) => {
+        rl.question(query, (answer) => {
+            resolve(answer);
+        });
+    });
+}
+
+    async function main(){
+    const existUser = await askQuestion("Are you a new User or not (Y/N) :");
+    
+    
+    if(existUser.toUpperCase() === 'Y'){
+        const userName = await askQuestion("Enter your name :");
+        const userAge = await askQuestion("Please mention your age :");
+        const userMob = await askQuestion("Enter your Phone Number :");
+
+    }
+
+    rl.close();
+}
+await main();
+
+
+
+
+
 
 
 
