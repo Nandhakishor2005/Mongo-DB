@@ -127,21 +127,34 @@ async function connect() {
                 console.log(" 1. Book your Appoinment");
                 console.log(" 2. View your Appoinment");
                 console.log(" 3. Do you want to exit ?");
+                let value =1;
+                    while(value){
 
-                const option = await askQuestion("Please select tour Option :");
+                const option = await askQuestion("Please select your Option :");
 
                 if(option == 1){
                     userId = await askQuestion("Enter Your Token ID :");
                     console.log(userId);
+
+                    console.log("Available Departments...");
+                    const departmentList = await departments.find().toArray();
+                            for(let data of departmentList){
+                                console.log(`ID : ${data._id} | ${data.name}`);
+                            }
                 }
                 else if(option == 2){
                     userId = await askQuestion("Enter Your Token ID :");
                     console.log(userId)
                 }
                 else if(option == 3){
+                    value=0;
                     rl.close();
+                    break;
+
+                    
                 }else{
                     console.log("Enter a valid Option...")
+                }
                 }
 
 
