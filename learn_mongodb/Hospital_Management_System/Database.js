@@ -139,7 +139,7 @@ async function connect() {
                     console.log(userId)
                 }
                 else if(option == 3){
-                    exit();
+                    rl.close();
                 }else{
                     console.log("Enter a valid Option...")
                 }
