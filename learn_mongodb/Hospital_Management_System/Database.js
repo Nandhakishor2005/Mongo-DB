@@ -103,6 +103,50 @@ async function connect() {
         const userAge = await askQuestion("Please mention your age :");
         const userMob = await askQuestion("Enter your Phone Number :");
 
+        const patientId = await patients.find().sort({_id : -1}).limit(1).toArray();
+                let id;
+                if(patientId.length == 0){
+                    id = 100;
+                    console.log(id)
+                } else {
+                    id = patientId[0]._id + 1;
+                    console.log(id);
+                }
+
+                const patientData = await patients.insertOne({
+                    _id : id,
+                    userName: userName,
+                    userAge: userAge,
+                    userMob: userMob
+                });
+
+                console.log(`Your  Token ID is: ${id}. You need this Token for further operations!!`);
+
+
+                
+                console.log(" 1. Book your Appoinment");
+                console.log(" 2. View your Appoinment");
+                console.log(" 3. Do you want to exit ?");
+
+                const option = await askQuestion("Please select tour Option :");
+
+                if(option == 1){
+                    userId = await askQuestion("Enter Your Token ID :");
+                    console.log(userId);
+                }
+                else if(option == 2){
+                    userId = await askQuestion("Enter Your Token ID :");
+                    console.log(userId)
+                }
+                else if(option == 3){
+                    exit();
+                }else{
+                    console.log("Enter a valid Option...")
+                }
+
+
+
+
     }
 
     rl.close();
