@@ -141,10 +141,35 @@ async function connect() {
                             for(let data of departmentList){
                                 console.log(`ID : ${data._id} | ${data.name}`);
                             }
+
+                    const departmentId = Number (await askQuestion("Enter the ID of the department you want to visit : "));
+                            const doctorList = await doctors.find({departmentsId : departmentId}).toArray();
+                            for(let data of doctorList){
+                                console.log(`ID : ${data._id} | ${data.name}`);
+                            }
+
+                    const doctorId = Number (await askQuestion("Enter the ID of the doctor you want to visit : "));
+                    const appointment = await appointments.find().sort({_id : -1}).limit(1).toArray();
+
+                    const appointmentData = await appointments.insertOne({
+                                patientId : userId,
+                                appointmentDepartment : departmentId,
+                                appointmentDoctor : doctorList,
+                                appointmentBooking : new Date()
+                            });
+                            console.log("Appointment booked");
                 }
                 else if(option == 2){
-                    userId = await askQuestion("Enter Your Token ID :");
-                    console.log(userId)
+                    getId = Number(await askQuestion("Enter your ID : "));
+                            
+                            while(getId != id){
+                                getId = Number(await askQuestion("Enter your Correct ID : "));
+                            }
+
+                            const appointmentList = await appointments.find({patientId: getId}).toArray();
+                            for (let data of appointmentList) {
+                                console.log(`Appointment ID : ${data._id} | Department : ${data.appointmentDepartment} | Doctor: ${data.appointmentDoctor} | Booking : ${data.appointmentBooking}`);
+                            }
                 }
                 else if(option == 3){
                     value=0;
@@ -156,9 +181,6 @@ async function connect() {
                     console.log("Enter a valid Option...")
                 }
                 }
-
-
-
 
     }
 
