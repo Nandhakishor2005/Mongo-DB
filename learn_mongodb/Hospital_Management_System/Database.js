@@ -100,8 +100,34 @@ async function connect() {
     
     if(existUser.toUpperCase() === 'Y'){
         const userName = await askQuestion("Enter your name :");
-        const userAge = await askQuestion("Please mention your age :");
-        const userMob = await askQuestion("Enter your Phone Number :");
+        
+        let ageChecker = true;
+        let userAge;
+        while(ageChecker){
+            userAge = Number(await askQuestion("Please mention your age :"));
+            if(userAge > 0 && userAge <= 150){
+                ageChecker = false;
+
+            }
+            else{
+                console.log("Enter a valid Age !!")
+            }
+            
+        }
+
+            let age;
+            let userMob;
+
+            while(true){
+            userMob = await askQuestion("Enter your Phone Number :");
+
+            if(/^[6-9]\d{9}$/.test(userMob)){
+                break;
+            }
+            else{
+                console.log("Enter a valid 10 digit Phone Number !!");
+            }
+            }
 
         const patientId = await patients.find().sort({_id : -1}).limit(1).toArray();
                 let id;
@@ -126,14 +152,13 @@ async function connect() {
                 
                 console.log(" 1. Book your Appoinment");
                 console.log(" 2. View your Appoinment");
-                console.log(" 3. Do you want to exit ?");
+                console.log(" 3. exit ?");
                 let value =1;
-                    while(value){
-
+                while(value){
                 const option = await askQuestion("Please select your Option :");
 
                 if(option == 1){
-                    userId = await askQuestion("Enter Your Token ID :");
+                    let userId = Number( await askQuestion("Enter Your Token ID :"));
                     console.log(userId);
 
                     console.log("Available Departments...");
@@ -149,50 +174,177 @@ async function connect() {
                             }
 
                     const doctorId = Number (await askQuestion("Enter the ID of the doctor you want to visit : "));
+                    const selectedDoctor = doctorList.find(data => data._id === doctorId);
+
                     const appointment = await appointments.find().sort({_id : -1}).limit(1).toArray();
 
                     const appointmentData = await appointments.insertOne({
-                                patientId : userId,
-                                appointmentDepartment : departmentId,
-                                appointmentDoctor : doctorList,
-                                appointmentBooking : new Date()
-                            });
-                            console.log("Appointment booked");
-                }
-                else if(option == 2){
-                    getId = Number(await askQuestion("Enter your ID : "));
-                            
-                            while(getId != id){
-                                getId = Number(await askQuestion("Enter your Correct ID : "));
-                            }
+                    patientId : userId,
+                    appointmentDepartment : departmentList.find(data => data._id === departmentId).name,
+                    appointmentDoctor : selectedDoctor.name,
+                    appointmentBooking : new Date()
+                });
 
-                            const appointmentList = await appointments.find({patientId: getId}).toArray();
-                            for (let data of appointmentList) {
-                                console.log(`Appointment ID : ${data._id} | Department : ${data.appointmentDepartment} | Doctor: ${data.appointmentDoctor} | Booking : ${data.appointmentBooking}`);
-                            }
+
+                    console.log("Appointment booked");
                 }
+        else if(option == 2){
+    
+            let getId = Number(await askQuestion("Enter your ID : "));
+
+            while(getId != id){
+                getId = Number(await askQuestion("Enter your Correct ID : "));
+            }
+
+            const appointmentList = await appointments.find({
+                patientId: getId
+            }).toArray();
+
+            if(appointmentList.length == 0){
+                console.log("No appointments found");
+            }
+            else{
+                console.log("Your Appointments...");
+
+                for(let data of appointmentList){
+                    console.log(
+                        `Department : ${data.appointmentDepartment} | Doctor : ${data.appointmentDoctor} | Booking : ${data.appointmentBooking}`
+                    );
+                }
+            }
+        }
                 else if(option == 3){
                     value=0;
                     rl.close();
+                    console.log("Exiting...");
                     break;
 
                     
                 }else{
                     console.log("Enter a valid Option...")
-                }
-                }
+        }
+        }
 
     }
+    else if(existUser.toUpperCase() === 'N'){
+
+        console.log("WELCOME!!!");
+        console.log("1. Book your Appoinment");
+        console.log("2. View your Appoinment");
+        console.log("3. Exit");
+
+        let value = 1;
+
+        while(value){
+
+            const option = await askQuestion("Please select your Option :");
+
+            if(option == 1){
+
+                let userId = Number(await askQuestion("Enter Your Token ID :"));
+
+                let patient = await patients.findOne({_id: userId});
+
+                while(!patient){
+                    console.log("Invalid Token ID");
+                    userId = Number(await askQuestion("Enter Your Correct Token ID :"));
+                    patient = await patients.findOne({_id: userId});
+                }
+
+                console.log("Available Departments...");
+
+                const departmentList = await departments.find().toArray();
+
+                for(let data of departmentList){
+                    console.log(`ID : ${data._id} | ${data.name}`);
+                }
+
+                const departmentId = Number(await askQuestion("Enter the ID of the department you want to visit : "));
+                if(!departmentId){
+                    console.log(`invalid`)
+                    continue;
+                }
+
+                const doctorList = await doctors.find({
+                    departmentsId: departmentId
+                }).toArray();
+
+                for(let data of doctorList){
+                    console.log(`ID : ${data._id} | ${data.name}`);
+                }
+
+                const doctorId = Number(
+                    await askQuestion("Enter the ID of the doctor you want to visit : ")
+                );
+
+                const selectedDoctor = doctorList.find(
+                    data => data._id === doctorId
+                );
+
+                if(!selectedDoctor){
+                    console.log("Invalid Doctor ID");
+                    continue;
+                }
+
+                await appointments.insertOne({
+                    patientId: userId,
+                    appointmentDepartment: departmentList.find(
+                        data => data._id === departmentId
+                    ).name,
+                    appointmentDoctor: selectedDoctor.name,
+                    appointmentBooking: new Date()
+                });
+
+                console.log("Appointment booked");
+            }
+
+            else if(option == 2){
+
+                const getId = Number(
+                    await askQuestion("Enter your Token ID : ")
+                );
+
+                const patient = await patients.findOne({_id: getId});
+
+                if(!patient){
+                    console.log("Invalid ID");
+                    continue;
+                }
+
+                const appointmentList = await appointments.find({
+                    patientId: getId
+                }).toArray();
+
+                if(appointmentList.length == 0){
+                    console.log("No appointments found");
+                }
+                else{
+                    console.log("Your Appointments...");
+                    for(let data of appointmentList){
+                        console.log(
+                            `Department : ${data.appointmentDepartment} | Doctor : ${data.appointmentDoctor} | Booking : ${data.appointmentBooking}`
+                        );
+                    }
+                }
+            }
+
+            else if(option == 3){
+                rl.close();
+                console.log("Exiting...");
+                    break;
+            }
+            else{
+                console.log("Enter a valid Option...");
+            }
+        }
+    }else{
+        console.log(`Enter a valid option`)
+    }
+    
 
     rl.close();
 }
 await main();
-
-
-
-
-
-
 
 
     } 
