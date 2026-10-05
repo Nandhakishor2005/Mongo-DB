@@ -121,7 +121,7 @@ async function connect() {
             while(true){
             userMob = await askQuestion("Enter your Phone Number :");
 
-            if(/^[6-9]\d{9}$/.test(userMob)){
+            if(/^[1-9]\d{9}$/.test(userMob)){
                 break;
             }
             else{
@@ -167,27 +167,61 @@ async function connect() {
                                 console.log(`ID : ${data._id} | ${data.name}`);
                             }
 
-                    const departmentId = Number (await askQuestion("Enter the ID of the department you want to visit : "));
-                            const doctorList = await doctors.find({departmentsId : departmentId}).toArray();
-                            for(let data of doctorList){
-                                console.log(`ID : ${data._id} | ${data.name}`);
-                            }
+        let departmentId = Number(
+        await askQuestion("Enter the ID of the department you want to visit : ")
+        );
 
-                    const doctorId = Number (await askQuestion("Enter the ID of the doctor you want to visit : "));
-                    const selectedDoctor = doctorList.find(data => data._id === doctorId);
+        let department = departmentList.find(
+            data => data._id === departmentId
+        );
 
-                    const appointment = await appointments.find().sort({_id : -1}).limit(1).toArray();
+        while(!department){
+            console.log("Invalid Department ID");
 
-                    const appointmentData = await appointments.insertOne({
-                    patientId : userId,
-                    appointmentDepartment : departmentList.find(data => data._id === departmentId).name,
-                    appointmentDoctor : selectedDoctor.name,
-                    appointmentBooking : new Date()
-                });
+            departmentId = Number(
+                await askQuestion("Enter the correct Department ID : ")
+            );
 
+            department = departmentList.find(
+                data => data._id === departmentId
+            );
+        }
+            const doctorList = await doctors.find({
+                departmentsId: departmentId
+            }).toArray();
 
-                    console.log("Appointment booked");
-                }
+            for(let data of doctorList){
+                console.log(`ID : ${data._id} | ${data.name}`);
+            }
+
+let doctorId = Number( await askQuestion("Enter the ID of the doctor you want to visit : "));
+
+let selectedDoctor = doctorList.find(
+    data => data._id === doctorId
+);
+
+while(!selectedDoctor){
+    console.log("Invalid Doctor ID");
+
+    doctorId = Number(
+        await askQuestion("Enter the correct Doctor ID : ")
+    );
+
+    selectedDoctor = doctorList.find(
+        data => data._id === doctorId
+    );
+}
+
+await appointments.insertOne({ 
+                patientId : userId, 
+                appointmentDepartment : departmentList.find(
+                data => data._id === departmentId).name, 
+                appointmentDoctor : selectedDoctor.name, 
+                appointmentBooking : new Date() 
+            });
+
+            console.log("Appointment booked");
+    }
         else if(option == 2){
     
             let getId = Number(await askQuestion("Enter your ID : "));
@@ -259,19 +293,33 @@ async function connect() {
                     console.log(`ID : ${data._id} | ${data.name}`);
                 }
 
-                const departmentId = Number(await askQuestion("Enter the ID of the department you want to visit : "));
-                if(!departmentId){
-                    console.log(`invalid`)
-                    continue;
-                }
+            let departmentId = Number(
+            await askQuestion("Enter the ID of the department you want to visit : ")
+        );
 
-                const doctorList = await doctors.find({
-                    departmentsId: departmentId
-                }).toArray();
+            let department = departmentList.find(
+                data => data._id === departmentId
+            );
 
-                for(let data of doctorList){
-                    console.log(`ID : ${data._id} | ${data.name}`);
-                }
+        while(!department){
+            console.log("Invalid Department ID");
+
+            departmentId = Number(
+                await askQuestion("Enter the correct Department ID : ")
+            );
+
+            department = departmentList.find(
+                data => data._id === departmentId
+            );
+        }
+
+        const doctorList = await doctors.find({
+            departmentsId: departmentId
+        }).toArray();
+
+        for(let data of doctorList){
+            console.log(`ID : ${data._id} | ${data.name}`);
+        }
 
                 const doctorId = Number(
                     await askQuestion("Enter the ID of the doctor you want to visit : ")
